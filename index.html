@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="300">
+    <title>Unofficial Loudoun A/B Calendar (2024-2025)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1, h2, h3, h4 {
+            text-align: center;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #87cefa;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        .navigation button:hover {
+            background-color: #4682b4;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s, outline 0.3s;
+        }
+        .cell:hover {
+            background-color: #f0f8ff;
+        }
+        .cell.selected {
+            background-color: #87cefa;
+        }
+        .cell.empty {
+            background: none;
+            border: none;
+            cursor: default;
+        }
+        .cell.today {
+            outline: 3px solid #ff4500;
+        }
+        .cell.a-day {
+            background-color: #add8e6;
+        }
+        .cell.b-day {
+            background-color: #4682b4;
+            color: white;
+        }
+        .cell.weekend {
+            background-color: #f0f0f0;
+            color: #aaa;
+        }
+        .cell.student-day-off {
+            background-color: #000080;
+            color: white;
+        }
+        .legend {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .legend-item {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 5px 15px;
+            border-radius: 3px;
+            color: #fff;
+        }
+        .legend-a {
+            background-color: #add8e6;
+            color: #000;
+        }
+        .legend-b {
+            background-color: #4682b4;
+        }
+        .legend-student-day {
+            background-color: #000080;
+        }
+    </style>
+</head>
+<body>
+	<h3>Unofficial Loudoun A/B Calendar (2024-2025) v1.0</h3>
+    <h2 id="dayStatus"></h2>
+    <div class="navigation">
+        <button id="prevMonth">&lt; Previous</button>
+        <span id="currentMonth"></span>
+        <button id="nextMonth">Next &gt;</button>
+    </div>
+    <div id="calendar-container"></div>
+    <div class="legend">
+        <div class="legend-item legend-a">A Days</div>
+        <div class="legend-item legend-b">B Days</div>
+        <div class="legend-item legend-student-day">Student Days Off</div>
+    </div>
+    <script>
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth();
+
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        const firstADay = new Date(2024, 7, 22); // August 22, 2024
+        const lastDay = new Date(2025, 5, 13); // June 13, 2025
+
+        const studentDaysOff = [
+            "2024-08-30", "2024-09-02", "2024-10-03", "2024-10-04",
+            "2024-10-14", "2024-10-30", "2024-10-31", "2024-11-01",
+            "2024-11-04", "2024-11-05", "2024-11-27", "2024-11-28",
+            "2024-11-29", "2024-12-23", "2024-12-24", "2024-12-25",
+            "2024-12-26", "2024-12-27", "2024-12-30", "2024-12-31",
+            "2025-01-01", "2025-01-02", "2025-01-03", "2025-01-20",
+            "2025-01-27", "2025-01-28", "2025-01-29", "2025-02-17",
+            "2025-03-31", "2025-04-04", "2025-04-07", "2025-04-14",
+            "2025-04-15", "2025-04-16", "2025-04-17", "2025-04-18",
+            "2025-05-26"
+        ];
+
+        function isWeekend(year, month, day) {
+            const date = new Date(year, month, day);
+            return date.getDay() === 0 || date.getDay() === 6;
+        }
+
+        function isStudentDayOff(year, month, day) {
+            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            return studentDaysOff.includes(dateString);
+        }
+
+        function calculateABDay(year, month, day) {
+            const currentDate = new Date(year, month, day);
+            if (currentDate < firstADay || currentDate > lastDay) return null;
+
+            let daysCount = 0;
+            for (let d = new Date(firstADay); d <= currentDate; d.setDate(d.getDate() + 1)) {
+                if (!isWeekend(d.getFullYear(), d.getMonth(), d.getDate()) && !isStudentDayOff(d.getFullYear(), d.getMonth(), d.getDate())) {
+                    daysCount++;
+                }
+            }
+            return daysCount % 2 === 1 ? "A" : "B";
+        }
+
+        function determineDayStatus() {
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const day = today.getDate();
+
+            const dateString = `(${monthNames[month]} ${day})`;
+            const statusElement = document.getElementById("dayStatus");
+
+            if (isWeekend(year, month, day)) {
+                statusElement.textContent = `Today ${dateString} is a weekend.`;
+            } else if (isStudentDayOff(year, month, day)) {
+                statusElement.textContent = `Today ${dateString} is a student day off.`;
+            } else {
+                const abDay = calculateABDay(year, month, day);
+                if (abDay === "A") {
+                    statusElement.textContent = `Today ${dateString} is an A day.`;
+                } else if (abDay === "B") {
+                    statusElement.textContent = `Today ${dateString} is a B day.`;
+                } else {
+                    statusElement.textContent = `Today ${dateString} is not a special day.`;
+                }
+            }
+        }
+
+        function generateCalendar(year, month) {
+            const calendarContainer = document.getElementById("calendar-container");
+            calendarContainer.innerHTML = "";
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const currentMonthElement = document.getElementById("currentMonth");
+            currentMonthElement.textContent = `${monthNames[month]} ${year}`;
+
+            const calendarGrid = document.createElement("div");
+            calendarGrid.className = "calendar";
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement("div");
+                emptyCell.className = "cell empty";
+                calendarGrid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                cell.textContent = day;
+
+                if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                    cell.classList.add("today");
+                }
+
+                if (isWeekend(year, month, day)) {
+                    cell.classList.add("weekend");
+                } else if (isStudentDayOff(year, month, day)) {
+                    cell.classList.add("student-day-off");
+                } else {
+                    const abDay = calculateABDay(year, month, day);
+                    if (abDay === "A") {
+                        cell.classList.add("a-day");
+                    } else if (abDay === "B") {
+                        cell.classList.add("b-day");
+                    }
+                }
+                calendarGrid.appendChild(cell);
+            }
+
+            calendarContainer.appendChild(calendarGrid);
+        }
+
+        document.getElementById("prevMonth").addEventListener("click", () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentYear, currentMonth);
+        });
+
+        document.getElementById("nextMonth").addEventListener("click", () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentYear, currentMonth);
+        });
+
+        determineDayStatus();
+        generateCalendar(currentYear, currentMonth);
+    </script>
+</body>
+</html>
