@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="300">
-    <title>Unofficial Loudoun A/B Calendar (2024-2025)</title>
+    <title>Unofficial A/B Calendar (25-26)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,6 +82,11 @@
             background-color: #000080;
             color: white;
         }
+        .footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.9em;
+        }
         .legend {
             margin-top: 20px;
             text-align: center;
@@ -107,7 +112,7 @@
     </style>
 </head>
 <body>
-	<h3>Unofficial Loudoun A/B Calendar (2024-2025) v1.0</h3>
+	<h3>Unofficial A/B Calendar (25-26) v1.0</h3>
     <h2 id="dayStatus"></h2>
     <div class="navigation">
         <button id="prevMonth">&lt; Previous</button>
@@ -120,6 +125,9 @@
         <div class="legend-item legend-b">B Days</div>
         <div class="legend-item legend-student-day">Student Days Off</div>
     </div>
+    <div class="footer">
+        <a href="https://files-backend.assets.thrillshare.com/documents/asset/uploaded_file/4461/Jml/c22ba0b8-3a04-405a-abe0-7f5c0e76e59e/25-26-JML-Fixed-A_B-Calendar.pdf?disposition=inline">Posted JML A/B</a>
+    </div>
     <script>
         const today = new Date();
         let currentYear = today.getFullYear();
@@ -130,20 +138,48 @@
             "July", "August", "September", "October", "November", "December"
         ];
 
-        const firstADay = new Date(2024, 7, 22); // August 22, 2024
-        const lastDay = new Date(2025, 5, 13); // June 13, 2025
+        const firstADay = new Date(2025, 7, 21); // August 21, 2025
+        const lastDay = new Date(2026, 5, 15); // June 15, 2026
 
         const studentDaysOff = [
-            "2024-08-30", "2024-09-02", "2024-10-03", "2024-10-04",
-            "2024-10-14", "2024-10-30", "2024-10-31", "2024-11-01",
-            "2024-11-04", "2024-11-05", "2024-11-27", "2024-11-28",
-            "2024-11-29", "2024-12-23", "2024-12-24", "2024-12-25",
-            "2024-12-26", "2024-12-27", "2024-12-30", "2024-12-31",
-            "2025-01-01", "2025-01-02", "2025-01-03", "2025-01-20",
-            "2025-01-27", "2025-01-28", "2025-01-29", "2025-02-17",
-            "2025-03-31", "2025-04-04", "2025-04-07", "2025-04-14",
-            "2025-04-15", "2025-04-16", "2025-04-17", "2025-04-18",
-            "2025-05-26"
+            "2025-08-29", // Staff & Student Holiday (Labor Day)
+            "2025-09-01", // Staff & Student Holiday (Labor Day)
+            "2025-10-02", // Staff & Student Holiday (Yom Kippur)
+            "2025-10-13", // Staff & Student Holiday (Indigenous Peoples' Day)
+            "2025-10-20", // Staff & Student Holiday (Diwali)
+            "2025-10-31", // Student Holiday / Teacher Work Day
+            "2025-11-03", // Student Holiday / Professional Development Day
+            "2025-11-04", // Student Holiday / Teacher Work Day
+            "2025-11-26", // Thanksgiving Break
+            "2025-11-27", // Thanksgiving Break
+            "2025-11-28", // Thanksgiving Break
+            "2025-12-22", // Winter Break
+            "2025-12-23", // Winter Break
+            "2025-12-24", // Winter Break
+            "2025-12-25", // Winter Break
+            "2025-12-26", // Winter Break
+            "2025-12-27", // Winter Break
+            "2025-12-28", // Winter Break
+            "2025-12-29", // Winter Break
+            "2025-12-30", // Winter Break
+            "2025-12-31", // Winter Break
+            "2026-01-01", // Winter Break
+            "2026-01-02", // Winter Break
+            "2026-01-03", // Winter Break
+            "2026-01-04", // Winter Break
+            "2026-01-19", // Staff & Student Holiday (Dr. Martin Luther King, Jr. Day)
+            "2026-01-23", // Student Holiday / Teacher Work Day
+            "2026-02-16", // Staff & Student Holiday (Presidents' Day)
+            "2026-02-17", // Staff & Student Holiday (Lunar New Year)
+            "2026-03-19", // Student Holiday / Professional Development Day
+            "2026-03-20", // Staff & Student Holiday (Eid al Fitr)
+            "2026-03-30", // Spring Break
+            "2026-03-31", // Spring Break
+            "2026-04-01", // Spring Break
+            "2026-04-02", // Spring Break
+            "2026-04-03", // Spring Break
+            "2026-04-10", // Student Holiday / Teacher Work Day
+            "2026-05-25", // Staff & Student Holiday (Memorial Day)
         ];
 
         function isWeekend(year, month, day) {
@@ -188,7 +224,7 @@
                 } else if (abDay === "B") {
                     statusElement.textContent = `Today ${dateString} is a B day.`;
                 } else {
-                    statusElement.textContent = `Today ${dateString} is not a special day.`;
+                    statusElement.textContent = ``;
                 }
             }
         }
